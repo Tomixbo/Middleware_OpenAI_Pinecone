@@ -6,23 +6,13 @@ from pinecone import Pinecone
 from fastapi import FastAPI, HTTPException, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
+
 import pinecone
-from threading import Thread
-import uvicorn
 
 load_dotenv()
 
 # uvicorn app:app --host 0.0.0.0 --port 10000
 app = FastAPI()
-
-def run():
-    app.run(host="0.0.0.0", port=10000)
-
-def keep_alive():
-  t = Thread(target=run)
-  t.start()
-
-keep_alive()
 
 # Setup environment variables
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -58,10 +48,6 @@ def validate_token(
 
 class QueryModel(BaseModel):
     query: str
-
-@app.route('/')
-def index():
-  return "Alive"
 
 @app.post("/hugo/")
 async def get_context_hugo(
@@ -130,4 +116,3 @@ async def get_context_cleon(
     context = [match["metadata"]["text"] for match in results["matches"]]
     # Retrun context
     return context
-
