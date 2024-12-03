@@ -8,7 +8,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 
 import pinecone
+from keep_alive import keep_alive
 
+keep_alive()
 load_dotenv()
 
 # uvicorn app:app --host 0.0.0.0 --port 10000
