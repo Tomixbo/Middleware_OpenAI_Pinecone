@@ -16,7 +16,7 @@ load_dotenv()
 app = FastAPI()
 
 def run():
-    uvicorn.run("app:app", host="0.0.0.0", port=10000, reload=True)
+    app.run(host="0.0.0.0", port=10000)
 
 def keep_alive():
   t = Thread(target=run)
