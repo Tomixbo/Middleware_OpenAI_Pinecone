@@ -3,3 +3,4 @@ openai
 pydantic
 python-dotenv
 pinecone-client
+flask
