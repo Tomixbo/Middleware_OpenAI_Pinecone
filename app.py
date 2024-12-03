@@ -6,9 +6,13 @@ from pinecone import Pinecone
 from fastapi import FastAPI, HTTPException, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-
 import pinecone
-from keep_alive import keep_alive
+from threading import Thread
+
+
+def keep_alive():
+  t = Thread(target=run)
+  t.start()
 
 keep_alive()
 load_dotenv()
@@ -50,6 +54,10 @@ def validate_token(
 
 class QueryModel(BaseModel):
     query: str
+
+@app.route('/')
+def index():
+  return "Alive"
 
 @app.post("/hugo/")
 async def get_context_hugo(
@@ -118,3 +126,6 @@ async def get_context_cleon(
     context = [match["metadata"]["text"] for match in results["matches"]]
     # Retrun context
     return context
+
+def run():
+    uvicorn.run("app:app", host="0.0.0.0", port=10000, reload=True)
