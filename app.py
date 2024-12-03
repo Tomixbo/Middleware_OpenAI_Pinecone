@@ -8,19 +8,21 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 import pinecone
 from threading import Thread
+import uvicorn
+
+load_dotenv()
+
+# uvicorn app:app --host 0.0.0.0 --port 10000
+app = FastAPI()
 
 def run():
-    app.run(host="0.0.0.0", port=10000)
+    uvicorn.run("app:app", host="0.0.0.0", port=10000, reload=True)
 
 def keep_alive():
   t = Thread(target=run)
   t.start()
 
 keep_alive()
-load_dotenv()
-
-# uvicorn app:app --host 0.0.0.0 --port 10000
-app = FastAPI()
 
 # Setup environment variables
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
