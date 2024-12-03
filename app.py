@@ -9,6 +9,8 @@ from pydantic import BaseModel
 import pinecone
 from threading import Thread
 
+def run():
+    uvicorn.run("app:app", host="0.0.0.0", port=10000, reload=True)
 
 def keep_alive():
   t = Thread(target=run)
@@ -127,5 +129,3 @@ async def get_context_cleon(
     # Retrun context
     return context
 
-def run():
-    uvicorn.run("app:app", host="0.0.0.0", port=10000, reload=True)
