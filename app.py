@@ -16,8 +16,6 @@ app = FastAPI()
 
 # Setup environment variables
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
-pinecone_api_key_v2 = os.getenv("PINECONE_API_KEY_v2")
 environment = os.getenv("PINECONE_ENV")
 index_hugo_name = os.getenv("PINECONE_INDEX_HUGO")
 index_marie_name = os.getenv("PINECONE_INDEX_MARIE")
@@ -25,8 +23,8 @@ index_kate_name = os.getenv("PINECONE_INDEX_KATE")
 index_cleon_name = os.getenv("PINECONE_INDEX_CLEON")
 
 # Initialize pinecone client
-pc = Pinecone(api_key=os.getenv(pinecone_api_key))
-pc_v2 = Pinecone(api_key=os.getenv(pinecone_api_key_v2))
+pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+pc_v2 = Pinecone(api_key=os.getenv("PINECONE_API_KEY_v2"))
 index_hugo = pc.Index(index_hugo_name)
 index_marie = pc.Index(index_marie_name)
 index_kate = pc.Index(index_kate_name)
