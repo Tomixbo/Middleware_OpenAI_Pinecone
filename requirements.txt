@@ -2,4 +2,4 @@ fastapi[all]
 openai
 pydantic
 python-dotenv
-pinecone-client
+pinecone
