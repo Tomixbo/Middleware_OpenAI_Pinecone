@@ -238,8 +238,8 @@ def search_hugo_knowledge(query: str) -> KnowledgeSearchOutput:
 kate_mcp = FastMCP(
     name="KATE Knowledge",
     instructions=(
-        "Use this server before answering questions about French labor "
-        "and employment law for CAP CONSEILS."
+        "Use this server before answering questions about French corporate "
+        "law for CAP CONSEILS."
     ),
     json_response=True,
     streamable_http_path="/",
@@ -250,11 +250,12 @@ kate_mcp = FastMCP(
 @kate_mcp.tool()
 def search_kate_knowledge(query: str) -> KnowledgeSearchOutput:
     """
-    Search CAP CONSEILS internal knowledge on French labor and employment law.
-    Use before answering on employment contracts, payroll, leave, working time,
-    absences, disciplinary actions, termination, dismissals, employer-employee
-    relations, or social obligations. Do not use for accounting, tax,
-    corporate law, or audit.
+    Search CAP CONSEILS internal knowledge on French corporate law.
+    Use before answering on company formation, governance, bylaws,
+    shareholders, directors, meetings, annual accounts approval,
+    capital transactions, share transfers, transformations, mergers,
+    dissolutions, or corporate filings. Do not use for accounting,
+    tax, labor law, or audit.
     """
     return build_search_output(index_kate_v2, query, top_k=10)
 
@@ -262,8 +263,8 @@ def search_kate_knowledge(query: str) -> KnowledgeSearchOutput:
 marie_mcp = FastMCP(
     name="MARIE Knowledge",
     instructions=(
-        "Use this server before answering questions about French corporate "
-        "law for CAP CONSEILS."
+        "Use this server before answering questions about French labor "
+        "and employment law for CAP CONSEILS."
     ),
     json_response=True,
     streamable_http_path="/",
@@ -274,12 +275,11 @@ marie_mcp = FastMCP(
 @marie_mcp.tool()
 def search_marie_knowledge(query: str) -> KnowledgeSearchOutput:
     """
-    Search CAP CONSEILS internal knowledge on French corporate law.
-    Use before answering on company formation, governance, bylaws,
-    shareholders, directors, meetings, annual accounts approval,
-    capital transactions, share transfers, transformations, mergers,
-    dissolutions, or corporate filings. Do not use for accounting,
-    tax, labor law, or audit.
+    Search CAP CONSEILS internal knowledge on French labor and employment law.
+    Use before answering on employment contracts, payroll, leave, working time,
+    absences, disciplinary actions, termination, dismissals, employer-employee
+    relations, or social obligations. Do not use for accounting, tax,
+    corporate law, or audit.
     """
     return build_search_output(index_marie_v2, query, top_k=10)
 
