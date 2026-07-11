@@ -3,3 +3,4 @@ openai
 pydantic
 python-dotenv
 pinecone
+mcp>=1.27,<2
