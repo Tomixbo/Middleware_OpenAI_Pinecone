@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 from openai import OpenAI
 from pinecone import Pinecone
 from pydantic import BaseModel
@@ -34,15 +35,23 @@ class KnowledgeSearchOutput(BaseModel):
 
 app = FastAPI(title="CAP CONSEILS RAG")
 
-openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-index_hugo_name = os.getenv("PINECONE_INDEX_HUGO")
-index_marie_name = os.getenv("PINECONE_INDEX_MARIE")
-index_kate_name = os.getenv("PINECONE_INDEX_KATE")
-index_cleon_name = os.getenv("PINECONE_INDEX_CLEON")
+def require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"Missing environment variable: {name}")
+    return value
 
-pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-pc_v2 = Pinecone(api_key=os.getenv("PINECONE_API_KEY_v2"))
+
+openai_client = OpenAI(api_key=require_env("OPENAI_API_KEY"))
+
+index_hugo_name = require_env("PINECONE_INDEX_HUGO")
+index_marie_name = require_env("PINECONE_INDEX_MARIE")
+index_kate_name = require_env("PINECONE_INDEX_KATE")
+index_cleon_name = require_env("PINECONE_INDEX_CLEON")
+
+pc = Pinecone(api_key=require_env("PINECONE_API_KEY"))
+pc_v2 = Pinecone(api_key=require_env("PINECONE_API_KEY_v2"))
 
 index_hugo = pc.Index(index_hugo_name)
 index_marie = pc.Index(index_marie_name)
@@ -54,6 +63,22 @@ index_kate_v2 = pc_v2.Index(index_kate_name)
 index_cleon_v2 = pc_v2.Index(index_cleon_name)
 
 security = HTTPBearer()
+
+MCP_TRANSPORT_SECURITY = TransportSecuritySettings(
+    enable_dns_rebinding_protection=True,
+    allowed_hosts=[
+        "middleware-openai-pinecone.onrender.com",
+        "middleware-openai-pinecone.onrender.com:*",
+        "localhost",
+        "localhost:*",
+        "127.0.0.1",
+        "127.0.0.1:*",
+    ],
+    allowed_origins=[
+        "https://chatgpt.com",
+        "https://chat.openai.com",
+    ],
+)
 
 
 def validate_token(
@@ -90,13 +115,15 @@ def search_index(index: Any, query: str, top_k: int) -> list[KnowledgeResult]:
         matches = response.to_dict().get("matches", [])
 
     for match in matches:
-        metadata = getattr(match, "metadata", None) or match.get("metadata", {})
+        if isinstance(match, dict):
+            metadata = match.get("metadata", {}) or {}
+            score = match.get("score")
+        else:
+            metadata = getattr(match, "metadata", {}) or {}
+            score = getattr(match, "score", None)
+
         text = metadata.get("text")
         if isinstance(text, str) and text.strip():
-            score = getattr(match, "score", None)
-            if score is None and isinstance(match, dict):
-                score = match.get("score")
-
             paragraph = metadata.get("paragraph")
             if paragraph is not None:
                 paragraph = str(paragraph)
@@ -193,6 +220,7 @@ hugo_mcp = FastMCP(
     ),
     json_response=True,
     streamable_http_path="/",
+    transport_security=MCP_TRANSPORT_SECURITY,
 )
 
 
@@ -215,6 +243,7 @@ kate_mcp = FastMCP(
     ),
     json_response=True,
     streamable_http_path="/",
+    transport_security=MCP_TRANSPORT_SECURITY,
 )
 
 
@@ -238,6 +267,7 @@ marie_mcp = FastMCP(
     ),
     json_response=True,
     streamable_http_path="/",
+    transport_security=MCP_TRANSPORT_SECURITY,
 )
 
 
@@ -262,6 +292,7 @@ cleon_mcp = FastMCP(
     ),
     json_response=True,
     streamable_http_path="/",
+    transport_security=MCP_TRANSPORT_SECURITY,
 )
 
 
